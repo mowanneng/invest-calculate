@@ -27,6 +27,11 @@
 </head>
 <body>
 
+<!-- wechat browser notice -->
+<div id="wechatNotice" style="display:none;position:fixed;top:0;left:0;width:100%;background:#fffae6;color:#333;padding:10px;text-align:center;z-index:1000;font-size:14px;">
+    当前在微信内打开，建议点击右上角使用浏览器打开以获得更佳体验。
+</div>
+
 <div class="container">
     <h1>📈 价值投资复利计算器</h1>
     
@@ -60,7 +65,7 @@
 
     <!-- WeChat QR code section -->
     <div class="wechat-code">
-        <p>更多投资资讯，请扫码关注我们的公众号：</p>
+        <p> 更多投资资讯，请扫码关注我们的公众号：</p>
         <img src="公众号二维码.jpg" alt="WeChat QR Code" />
     </div>
 </div>
@@ -163,8 +168,15 @@
         });
     }
 
-    // 初始化加载
-    window.onload = updateAll;
+    // on load
+    window.onload = function() {
+        updateAll();
+        // detect WeChat browser
+        const ua = navigator.userAgent.toLowerCase();
+        if (ua.indexOf('micromessenger') !== -1) {
+            document.getElementById('wechatNotice').style.display = 'block';
+        }
+    };
 </script>
 
 </body>
