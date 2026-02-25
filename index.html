@@ -1,78 +1,288 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <!-- Ensure the document is interpreted as UTF-8; place as early as possible -->
     <meta charset="utf-8">
-    <!-- Responsive viewport allowing zoom but keeping layout fixed width -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>📈 价值投资复利计算器</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #2563eb; --secondary: #64748b; --bg: #f8fafc; }
-        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding: 20px; }
-        .container { width: 1000px; min-width:1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; zoom:1; }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; white-space: nowrap; }
-        .input-group { margin-bottom: 15px; white-space: nowrap; }
-        label { display: inline-block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; vertical-align: middle; }
-        input { width: 300px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; display: inline-block; vertical-align: middle; }
-        .stats { margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; }
-        .stats-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .chart-container { position: relative; height: 400px; width: 100%; }
-        /* wechat qr code styling */
-        .wechat-code { text-align: center; margin: 20px 0; }
-        .wechat-code img { width: 150px; max-width: 80%; height: auto; border: 1px solid #ccc; border-radius: 4px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root { 
+            --primary: #2563eb; 
+            --primary-dark: #1e40af;
+            --secondary: #64748b; 
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: white;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        
+        .container { 
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+        
+        .inputs-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            font-size: 0.95em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        input {
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .stats {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            margin-top: 10px;
+        }
+        
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+        }
+        
+        .stats-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .stats-item span:first-child {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        .stats-item b {
+            font-size: 1.2em;
+            color: var(--primary);
+        }
+        
+        .stats-item b.danger {
+            color: var(--danger);
+        }
+        
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .wechat-section {
+            border-top: 1px solid var(--border);
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+        
+        .wechat-section p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        
+        .wechat-code img {
+            width: 140px;
+            height: auto;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .wechat-code img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        #wechatNotice {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #fff7e6 0%, #fffae6 100%);
+            color: #333;
+            padding: 12px;
+            text-align: center;
+            z-index: 1000;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            input {
+                width: 100%;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            animation: slideIn 0.6s ease-out;
+        }
     </style>
 </head>
 <body>
 
-<!-- wechat browser notice -->
-<div id="wechatNotice" style="display:none;position:fixed;top:0;left:0;width:100%;background:#fffae6;color:#333;padding:10px;text-align:center;z-index:1000;font-size:14px;">
+<div id="wechatNotice" style="display:none;">
     当前在微信内打开，建议点击右上角使用浏览器打开以获得更佳体验。
 </div>
 
 <div class="container">
-    <h1>📈 价值投资复利计算器</h1>
-    
-    <div class="grid">
-        <div class="inputs">
+    <div class="header">
+        <h1>📈 价值投资复利计算器</h1>
+        <p class="subtitle">智能规划长期投资收益</p>
+    </div>
+
+    <div class="content">
+        <div class="inputs-card">
             <div class="input-group">
-                <label>初始本金 (元)</label>
+                <label>💰 初始本金 (元)</label>
                 <input type="number" id="principal" value="100000" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>每年追加金额 (元)</label>
+                <label>📊 每年追加金额 (元)</label>
                 <input type="number" id="annualAddition" value="50000" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>年收益率 (%)</label>
+                <label>📈 年收益率 (%)</label>
                 <input type="number" id="returnRate" value="15" step="0.1" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>投资年数</label>
+                <label>⏱️ 投资年数</label>
                 <input type="number" id="years" value="20" oninput="updateAll()">
             </div>
 
-            <div class="stats" id="summary">
-                </div>
+            <div class="stats" id="summary"></div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="investmentChart"></canvas>
+        <div class="chart-wrapper">
+            <div class="chart-container">
+                <canvas id="investmentChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- WeChat QR code section -->
-    <div class="wechat-code">
-        <p> 更多投资资讯，请长按扫码关注我们的公众号：</p>
-        <img src="公众号二维码.jpg" alt="WeChat QR Code" />
+    <div class="wechat-section">
+        <div class="wechat-code">
+            <p>更多投资资讯，请长按扫码关注我们的公众号</p>
+            <img src="公众号二维码.jpg" alt="WeChat QR Code" />
+        </div>
     </div>
 </div>
 
 <script>
     let myChart = null;
 
-    // 核心逻辑类 (翻译自你的 Python 代码)
     class InvestmentCalculator {
         constructor(principal, addition, rate) {
             this.principal = principal;
@@ -90,14 +300,13 @@
             let currentInvested = this.principal;
 
             for (let i = 0; i <= maxYears; i++) {
-                labels.push(`第 ${i} 年`);
-                amounts.push(currentAmount.toFixed(2));
-                cumulative.push(currentInvested.toFixed(2));
+                labels.push(`${i}年`);
+                amounts.push(parseFloat(currentAmount.toFixed(2)));
+                cumulative.push(parseFloat(currentInvested.toFixed(2)));
                 
                 let roi = i === 0 ? 0 : ((currentAmount - currentInvested) / currentInvested * 100);
-                returns.push(roi.toFixed(2));
+                returns.push(parseFloat(roi.toFixed(2)));
 
-                // 计算下一年的复利 (逻辑同 Python 代码)
                 currentAmount = currentAmount * (1 + this.rate) + this.addition;
                 currentInvested += this.addition;
             }
@@ -114,16 +323,30 @@
         const calc = new InvestmentCalculator(p, a, r);
         const data = calc.getData(y);
 
-        // 更新文字统计
         const finalAmount = data.amounts[y];
         const finalROI = data.returns[y];
+        const totalInvested = data.cumulative[y];
+        const totalProfit = finalAmount - totalInvested;
+
         document.getElementById('summary').innerHTML = `
-            <div class="stats-item"><span>最终总额:</span> <b>￥${(finalAmount/10000).toFixed(2)} 万</b></div>
-            <div class="stats-item"><span>累计投入:</span> <span>￥${(data.cumulative[y]/10000).toFixed(2)} 万</span></div>
-            <div class="stats-item"><span>总收益率:</span> <b style="color: #ef4444;">${finalROI}%</b></div>
+            <div class="stats-item">
+                <span>最终总额</span>
+                <b>￥${(finalAmount / 10000).toFixed(2)} 万</b>
+            </div>
+            <div class="stats-item">
+                <span>累计投入</span>
+                <b>￥${(totalInvested / 10000).toFixed(2)} 万</b>
+            </div>
+            <div class="stats-item">
+                <span>总收益</span>
+                <b class="danger">￥${(totalProfit / 10000).toFixed(2)} 万</b>
+            </div>
+            <div class="stats-item">
+                <span>收益率</span>
+                <b class="danger">${finalROI.toFixed(2)}%</b>
+            </div>
         `;
 
-        // 更新或创建图表
         renderChart(data);
     }
 
@@ -141,10 +364,15 @@
                         label: '总金额 (元)',
                         data: data.amounts,
                         borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
                         yAxisID: 'y',
                         fill: true,
-                        tension: 0.3
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
                     },
                     {
                         label: '收益率 (%)',
@@ -152,25 +380,44 @@
                         borderColor: '#ef4444',
                         borderDash: [5, 5],
                         yAxisID: 'y1',
-                        tension: 0.3
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { size: 12 }, padding: 15 }
+                    }
+                },
                 scales: {
-                    y: { type: 'linear', display: true, position: 'left', title: { display: true, text: '总金额 (元)' } },
-                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '收益率 (%)' } }
+                    y: { 
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: '总金额 (元)', font: { weight: 'bold' } },
+                        grid: { color: 'rgba(200, 200, 200, 0.1)' }
+                    },
+                    y1: { 
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: '收益率 (%)', font: { weight: 'bold' } }
+                    }
                 }
             }
         });
     }
 
-    // on load
     window.onload = function() {
         updateAll();
-        // detect WeChat browser
         const ua = navigator.userAgent.toLowerCase();
         if (ua.indexOf('micromessenger') !== -1) {
             document.getElementById('wechatNotice').style.display = 'block';
