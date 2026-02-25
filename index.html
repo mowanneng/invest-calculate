@@ -24,15 +24,99 @@
         .chart {
             width: 100%;
             max-width: 600px;
+            height: 300px; /* ensure visible area on mobile */
             margin: 20px 0;
+            position: relative;
+        }
+
+        /* responsive typography and layout adjustments */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+                margin: 15px 0;
+                text-align: center;
+            }
+            p {
+                font-size: 1em;
+                padding: 0 10px;
+                text-align: center;
+            }
+        }
+
+        /* wechat qr code styling */
+        .wechat-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .wechat-code img {
+            width: 150px;
+            max-width: 80%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <h1>Investment Calculation</h1>
     <div class="chart">
-        <!-- Chart content goes here -->
+        <canvas id="revenueChart"></canvas>
     </div>
     <p>Make your investment calculations more effective!</p>
+
+    <!-- WeChat QR code section -->
+    <div class="wechat-code">
+        <p>Scan to follow our WeChat public account:</p>
+        <img src="公众号二维码.jpg" alt="WeChat QR Code" />
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // sample data for the revenue curve
+        const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue',
+                data: [12, 19, 3, 5, 2, 3, 10, 15, 9, 7, 13, 18],
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 6
+                        }
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('load', () => {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, config);
+        });
+    </script>
 </body>
 </html>
