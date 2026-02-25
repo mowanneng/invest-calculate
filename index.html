@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=1200">
     <title>📈 价值投资复利计算器</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -27,10 +27,14 @@
             color: var(--text-primary);
             min-height: 100vh;
             padding: 30px 20px;
+            /* 防止移动端自动放大文字 */
+            -webkit-text-size-adjust: 100%;
+            overflow-x: auto; /* 在窄屏上可以横向滚动，保持桌面布局 */
         }
         
         .container { 
-            max-width: 1200px;
+            width: 1200px;
+            min-width: 1200px;
             margin: 0 auto;
             background: var(--card-bg);
             border-radius: 20px;
@@ -194,23 +198,24 @@
         }
         
         /* 响应式设计 */
+        /* 禁用响应式重排：在所有设备上保持桌面布局，窄屏时允许横向滚动 */
         @media (max-width: 768px) {
             .content {
-                grid-template-columns: 1fr;
-                gap: 30px;
-                padding: 25px;
+                grid-template-columns: 380px 1fr;
+                gap: 40px;
+                padding: 40px;
             }
-            
+
             h1 {
-                font-size: 2em;
+                font-size: 2.5em;
             }
-            
+
             input {
-                width: 100%;
+                width: auto;
             }
-            
+
             .chart-container {
-                height: 300px;
+                height: 400px;
             }
         }
         
