@@ -3,14 +3,14 @@
 <head>
     <!-- Ensure the document is interpreted as UTF-8; place as early as possible -->
     <meta charset="utf-8">
-    <!-- Responsive viewport (disable scaling to lock layout) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Responsive viewport allowing zoom but keeping layout fixed width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>📈 价值投资复利计算器</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --secondary: #64748b; --bg: #f8fafc; }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding: 20px; }
-        .container { width: 1000px; min-width:1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; }
+        .container { width: 1000px; min-width:1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; zoom:1; }
         h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
         .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; white-space: nowrap; }
         .input-group { margin-bottom: 15px; white-space: nowrap; }
@@ -64,7 +64,7 @@
 
     <!-- WeChat QR code section -->
     <div class="wechat-code">
-        <p> 更多投资资讯，请扫码关注我们的公众号：</p>
+        <p> 更多投资资讯，请长按扫码关注我们的公众号：</p>
         <img src="公众号二维码.jpg" alt="WeChat QR Code" />
     </div>
 </div>
