@@ -3,19 +3,19 @@
 <head>
     <!-- Ensure the document is interpreted as UTF-8; place as early as possible -->
     <meta charset="utf-8">
-    <!-- Responsive viewport -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Responsive viewport (disable scaling to lock layout) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>📈 价值投资复利计算器</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --secondary: #64748b; --bg: #f8fafc; }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; }
+        .container { width: 1000px; min-width:1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow-x: auto; }
         h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
-        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; white-space: nowrap; }
+        .input-group { margin-bottom: 15px; white-space: nowrap; }
+        label { display: inline-block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; vertical-align: middle; }
+        input { width: 300px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; display: inline-block; vertical-align: middle; }
         .stats { margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; }
         .stats-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
         .chart-container { position: relative; height: 400px; width: 100%; }
