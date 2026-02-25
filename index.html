@@ -183,8 +183,6 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         
-        /* 微信内打开提示已移除 */
-        
         /* 响应式设计 */
         /* 禁用响应式重排：在所有设备上保持桌面布局，窄屏时允许横向滚动 */
         @media (max-width: 768px) {
@@ -225,8 +223,6 @@
     </style>
 </head>
 <body>
-
-<!-- 微信内打开提示已移除 -->
 
 <div class="container">
     <div class="header">
@@ -441,10 +437,6 @@
 
     window.onload = function() {
         updateAll();
-        const ua = navigator.userAgent.toLowerCase();
-        if (ua.indexOf('micromessenger') !== -1) {
-            document.getElementById('wechatNotice').style.display = 'block';
-        }
     };
 </script>
 
