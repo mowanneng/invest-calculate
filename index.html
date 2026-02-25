@@ -355,14 +355,17 @@
         
         if (myChart) myChart.destroy();
 
+        // 把总金额转换为「万元」并保留一位小数，图表显示单位为万元
+        const amountsWan = data.amounts.map(v => parseFloat((v / 10000).toFixed(1)));
+
         myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: data.labels,
                 datasets: [
                     {
-                        label: '总金额 (元)',
-                        data: data.amounts,
+                        label: '总金额 (万元)',
+                        data: amountsWan,
                         borderColor: '#2563eb',
                         backgroundColor: 'rgba(37, 99, 235, 0.08)',
                         yAxisID: 'y',
@@ -382,7 +385,11 @@
                         yAxisID: 'y1',
                         tension: 0.4,
                         borderWidth: 2,
-                        pointRadius: 0
+                        // 和金额曲线一样显示散点
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
                     }
                 ]
             },
@@ -394,6 +401,21 @@
                         display: true,
                         position: 'top',
                         labels: { font: { size: 12 }, padding: 15 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                if (label && label.indexOf('总金额') !== -1) {
+                                    return label + ': ￥' + value.toFixed(1) + ' 万';
+                                }
+                                if (label && label.indexOf('收益率') !== -1) {
+                                    return label + ': ' + value.toFixed(2) + ' %';
+                                }
+                                return label + ': ' + value;
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -401,15 +423,25 @@
                         type: 'linear',
                         display: true,
                         position: 'left',
-                        title: { display: true, text: '总金额 (元)', font: { weight: 'bold' } },
-                        grid: { color: 'rgba(200, 200, 200, 0.1)' }
+                        title: { display: true, text: '总金额 (万元)', font: { weight: 'bold' } },
+                        grid: { color: 'rgba(200, 200, 200, 0.1)' },
+                        ticks: {
+                            callback: function(val) {
+                                return val.toFixed(1) + ' 万';
+                            }
+                        }
                     },
                     y1: { 
                         type: 'linear',
                         display: true,
                         position: 'right',
                         grid: { drawOnChartArea: false },
-                        title: { display: true, text: '收益率 (%)', font: { weight: 'bold' } }
+                        title: { display: true, text: '收益率 (%)', font: { weight: 'bold' } },
+                        ticks: {
+                            callback: function(val) {
+                                return val + ' %';
+                            }
+                        }
                     }
                 }
             }
