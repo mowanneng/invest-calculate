@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- Ensure the document is interpreted as UTF-8; place as early as possible -->
+    <meta charset="utf-8">
+    <!-- Responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 价值投资复利计算器</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #2563eb; --secondary: #64748b; --bg: #f8fafc; }
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: #1e293b; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .stats { margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; }
+        .stats-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📈 价值投资复利计算器</h1>
+    
+    <div class="grid">
+        <div class="inputs">
+            <div class="input-group">
+                <label>初始本金 (元)</label>
+                <input type="number" id="principal" value="100000" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>每年追加金额 (元)</label>
+                <input type="number" id="annualAddition" value="50000" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>年收益率 (%)</label>
+                <input type="number" id="returnRate" value="15" step="0.1" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>投资年数</label>
+                <input type="number" id="years" value="20" oninput="updateAll()">
+            </div>
+
+            <div class="stats" id="summary">
+                </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="investmentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myChart = null;
+
+    // 核心逻辑类 (翻译自你的 Python 代码)
+    class InvestmentCalculator {
+        constructor(principal, addition, rate) {
+            this.principal = principal;
+            this.addition = addition;
+            this.rate = rate / 100;
+        }
+
+        getData(maxYears) {
+            let labels = [];
+            let amounts = [];
+            let cumulative = [];
+            let returns = [];
+
+            let currentAmount = this.principal;
+            let currentInvested = this.principal;
+
+            for (let i = 0; i <= maxYears; i++) {
+                labels.push(`第 ${i} 年`);
+                amounts.push(currentAmount.toFixed(2));
+                cumulative.push(currentInvested.toFixed(2));
+                
+                let roi = i === 0 ? 0 : ((currentAmount - currentInvested) / currentInvested * 100);
+                returns.push(roi.toFixed(2));
+
+                // 计算下一年的复利 (逻辑同 Python 代码)
+                currentAmount = currentAmount * (1 + this.rate) + this.addition;
+                currentInvested += this.addition;
+            }
+            return { labels, amounts, cumulative, returns };
+        }
+    }
+
+    function updateAll() {
+        const p = parseFloat(document.getElementById('principal').value) || 0;
+        const a = parseFloat(document.getElementById('annualAddition').value) || 0;
+        const r = parseFloat(document.getElementById('returnRate').value) || 0;
+        const y = parseInt(document.getElementById('years').value) || 0;
+
+        const calc = new InvestmentCalculator(p, a, r);
+        const data = calc.getData(y);
+
+        // 更新文字统计
+        const finalAmount = data.amounts[y];
+        const finalROI = data.returns[y];
+        document.getElementById('summary').innerHTML = `
+            <div class="stats-item"><span>最终总额:</span> <b>￥${(finalAmount/10000).toFixed(2)} 万</b></div>
+            <div class="stats-item"><span>累计投入:</span> <span>￥${(data.cumulative[y]/10000).toFixed(2)} 万</span></div>
+            <div class="stats-item"><span>总收益率:</span> <b style="color: #ef4444;">${finalROI}%</b></div>
+        `;
+
+        // 更新或创建图表
+        renderChart(data);
+    }
+
+    function renderChart(data) {
+        const ctx = document.getElementById('investmentChart').getContext('2d');
+        
+        if (myChart) myChart.destroy();
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: '总金额 (元)',
+                        data: data.amounts,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        yAxisID: 'y',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: '收益率 (%)',
+                        data: data.returns,
+                        borderColor: '#ef4444',
+                        borderDash: [5, 5],
+                        yAxisID: 'y1',
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { type: 'linear', display: true, position: 'left', title: { display: true, text: '总金额 (元)' } },
+                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '收益率 (%)' } }
+                }
+            }
+        });
+    }
+
+    // 初始化加载
+    window.onload = updateAll;
+</script>
+
+</body>
+</html>
